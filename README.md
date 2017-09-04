@@ -3,11 +3,17 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
-
+A: constraint propagation is the idea of applying different type of constraint simultinously until we reach a solution
+ to solve the naked twin problem we used 2 constraint technique  "elimination" and "only choice"
+ the usage of elimination and only choice helped us in reducing the posibilities and reaching a modified version of the sudoku and consequetly
+ it helped us to take advantage of the naked twins constraint in order to solve the sudoku
+ 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: the easiest solution was to add the diagonal contraint to the unit list as below
+diagonal_units = [[rs+cs for rs,cs in zip(rows,cols)], [rs+cs for rs,cs in zip(rows,revcols)]]
+unitlist = row_units + column_units + square_units + diagonal_units
+ 
 
 ### Install
 

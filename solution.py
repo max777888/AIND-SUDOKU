@@ -10,7 +10,11 @@ boxes = cross(rows, cols)
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-unitlist = row_units + column_units + square_units
+colslist = list(cols)
+colslist.reverse()
+revcols = "".join(colslist)
+diagonal_units = [[rs+cs for rs,cs in zip(rows,cols)], [rs+cs for rs,cs in zip(rows,revcols)]]
+unitlist = row_units + column_units + square_units + diagonal_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
@@ -42,7 +46,7 @@ def naked_twins(values):
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
     #dual_values = [box for box in values.keys() if len(values[box]) == 2]
-    for column in row_units:
+    for column in row_units :
       dual_values= [box for box in column if len(values[box])==2]
       for box in dual_values: 	
         twin_values=[twinbox for twinbox in column if values[twinbox]==values[box]]
@@ -117,10 +121,41 @@ def only_choice(values):
 
 
 def reduce_puzzle(values):
-    pass
+    stalled = False
+    while not stalled:
+      # Check how many boxes have a determined value
+      solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
+      # apply the constraint progagation technique
+      values = eliminate(values)
+      values = only_choice(values)
+      values = naked_twins(values) 
+      
+	  # Check how many boxes have a determined value, to compare
+      solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
+      # If no new values were added, stop the loop.
+      stalled = solved_values_before == solved_values_after
+      # Sanity check, return False if there is a box with zero available values:
+      if len([box for box in values.keys() if len(values[box]) == 0]):
+        return False
+    return values
 
 def search(values):
-    pass
+    # "Using depth-first search and propagation, try all possible values."
+    # First, reduce the puzzle using the previous function
+    values = reduce_puzzle(values)
+    if values is False:
+      return False ## Failed earlier
+    if all(len(values[s]) == 1 for s in boxes): 
+      return values ## Solved!
+    # Choose one of the unfilled squares with the fewest possibilities
+    n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
+    # Now use recurrence to solve each one of the resulting sudokus, and 
+    for value in values[s]:
+      new_sudoku = values.copy()
+      new_sudoku[s] = value
+      attempt = search(new_sudoku)
+      if attempt:
+        return attempt
 
 def solve(grid):
     """
@@ -131,35 +166,7 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    stalled = False
-    while not stalled:
-        # Check how many boxes have a determined value
-        solved_values_before = len([box for box in grid.keys() if len(grid[box]) == 1])
-
-        # Your code here: Use the Eliminate Strategy
-        solved_grid = [box for box in grid.keys() if len(grid[box]) == 1]
-        for box in solved_grid:
-          digit = grid[box]
-          for peer in peers[box]:
-            grid[peer] = grid[peer].replace(digit,'')
-
-
-        # Your code here: Use the Only Choice Strategy
-        for unit in unitlist:
-          for digit in '123456789':
-            dplaces = [box for box in unit if digit in grid[box]]
-            # return the boxes having the criteria ie the digit exists in them
-            if len(dplaces) == 1:
-              grid[dplaces[0]] = digit
-        
-        # Check how many boxes have a determined value, to compare
-        solved_grid_after = len([box for box in grid.keys() if len(grid[box]) == 1])
-        # If no new grid were added, stop the loop.
-        stalled = solved_grid_before == solved_grid_after
-        # Sanity check, return False if there is a box with zero available grid:
-        if len([box for box in grid.keys() if len(grid[box]) == 0]):
-          return False
-    return grid
+    return search(grid_values(grid))
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
