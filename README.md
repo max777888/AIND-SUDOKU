@@ -7,7 +7,11 @@ A: constraint propagation is the idea of applying different type of constraint s
  to solve the naked twin problem we used 2 constraint technique  "elimination" and "only choice"
  the usage of elimination and only choice helped us in reducing the posibilities and reaching a modified version of the sudoku and consequetly
  it helped us to take advantage of the naked twins constraint in order to solve the sudoku
- 
+ if we have naked twin constraint in a row then we eliminate similar digits from the boxes in the row
+ if we have naked twin in a column then we elimintate similar digits from the boxes in that column
+ if we have naked twin in a cube then we eliminate similar digits from the boxes inside that cube
+ we may encounter the case were we have naked twin in a row in the same cube in this case we eliminate similar digits fromt the boxes in the row as well as 
+ from the boxes inside the same cube
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
 A: the easiest solution was to add the diagonal contraint to the unit list as below

@@ -46,27 +46,16 @@ def naked_twins(values):
     # Find all instances of naked twins
     # Eliminate the naked twins as possibilities for their peers
     #dual_values = [box for box in values.keys() if len(values[box]) == 2]
-    for column in row_units :
-      dual_values= [box for box in column if len(values[box])==2]
+    for unit in unitlist :   #unit is a  row or column or diagonal or cube
+      dual_values= [box for box in unit if len(values[box])==2]
       for box in dual_values: 	
-        twin_values=[twinbox for twinbox in column if values[twinbox]==values[box]]
+        twin_values=[twinbox for twinbox in unit if values[twinbox]==values[box]]
         if (len(set(twin_values))>1):
           for indiv_twin_values in twin_values:
-            for peer in column:
+            for peer in unit:
               if peer not in twin_values:
                 for digit in values[indiv_twin_values]:
                   values[peer] = values[peer].replace(digit,'')
-    for column in column_units:
-      dual_values= [box for box in column if len(values[box])==2]
-      for box in dual_values: 	
-        twin_values=[twinbox for twinbox in column if values[twinbox]==values[box]]
-        if (len(set(twin_values))>1):
-          for indiv_twin_values in twin_values:
-            for peer in column:
-              if peer not in twin_values:
-                for digit in values[indiv_twin_values]:
-                  values[peer] = values[peer].replace(digit,'')
-	
     return values		
 def display(values):
     """
